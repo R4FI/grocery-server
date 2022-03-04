@@ -299,6 +299,8 @@ async function run(){
                       res.json(result);
                   });
 
+                 
+
                   // feedback section
 
                      //     add feed back api
@@ -316,6 +318,7 @@ async function run(){
                   console.log(result);
                   res.json(result);
           })
+         
           
           // paymennt
           app.get('/orders/:id', async (req, res) => {
@@ -324,6 +327,35 @@ async function run(){
             const result = await ordersCollection.findOne(query);
             res.json(result);
         });
+
+         // update
+         app.put('/orders/:id', async (req, res) => {
+          const id = req.params.id;
+          const payment=req.body;
+          const filter = { _id: ObjectId(id)};
+          const updateDoc = {
+            $set :{
+              payment : payment
+            }
+          };
+          const result = await ordersCollection.updateOne(filter,updateDoc);
+          res.json(result);
+      });
+
+            // payment
+        app.post('/create-payment-intent', async (req, res) => {
+          const paymentInfo = req.body;
+          const amount = paymentInfo.price * 100;
+          const paymentIntent = await stripe.paymentIntents.create({
+              currency: 'usd',
+              amount: amount,
+              payment_method_types: ['card']
+          });
+          res.json({ clientSecret: paymentIntent.client_secret })
+      })
+
+
+       
 
 
 
